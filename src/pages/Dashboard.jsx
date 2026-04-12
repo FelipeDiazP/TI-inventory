@@ -2,7 +2,7 @@ import DashboardLayout from '../layouts/DashboardLayout.jsx'
 import { useEffect, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../config/database'
-import HeaderComponent from '../components/header.jsx'
+import HeaderComponent from '../components/Header.jsx'
 
 export default function Dashboard () {
   const [tickets, setTickets] = useState([])
