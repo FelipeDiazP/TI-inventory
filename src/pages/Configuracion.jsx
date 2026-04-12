@@ -1,4 +1,4 @@
-import HeaderComponent from '../components/header'
+import HeaderComponent from '../components/Header.jsx'
 import DashboardLayout from '../layouts/DashboardLayout'
 
 export default function Configuracion () {
