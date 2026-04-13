@@ -81,7 +81,7 @@ export default function Register () {
   }
 
   return (
-    <div className='min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 md:px-2'>
+    <div className='min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 md:px-2 animate-fade-in-up'>
       <Notification
         message={notification.message}
         type={notification.type}

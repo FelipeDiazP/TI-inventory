@@ -9,7 +9,7 @@ export default function Dashboard () {
   const [soportes, setSoportes] = useState([])
 
   const obtenerTickets = async () => {
-    const rest = await fetch('http://localhost:3000/tickets')
+    const rest = await fetch('https://api-equipo-yh4r.onrender.com/tickets')
     const data = await rest.json()
     setTickets(data)
   }
@@ -31,7 +31,7 @@ export default function Dashboard () {
   }, [])
 
   const asignarSoporte = async (ticketId, soporteId) => {
-    await fetch(`http://localhost:3000/tickets/${ticketId}/asignar`, {
+    await fetch(`https://api-equipo-yh4r.onrender.com/${ticketId}/asignar`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -49,7 +49,7 @@ export default function Dashboard () {
   const cambiarEstado = async (id, estadoActual) => {
     const nuevoEstado = estadoActual === 'Pendiente' ? 'Resuelto' : 'Pendiente'
 
-    await fetch(`http://localhost:3000/tickets/${id}`, {
+    await fetch(`https://api-equipo-yh4r.onrender.com/tickets/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -72,7 +72,29 @@ export default function Dashboard () {
               tickets.map((t) => (
                 <div key={t.id} className='bg-white rounded-2xl shadow-md p-4 border hover:shadow-lg transition'>
                   <h3 className='text-lg font-semibold'>{t.titulo}</h3>
-                  <p className='text-gray-700 text-sm mt-1'>{t.descripcion}</p>
+                  <div className='text-gray-700 text-sm mt-1'>
+                    {
+                      (() => {
+                        let descripcion
+
+                        if (typeof t.descripcion === 'string') {
+                          try {
+                            descripcion = JSON.parse(t.descripcion)
+                          } catch {
+                            descripcion = { mensaje: t.descripcion }
+                          }
+                        } else {
+                          descripcion = t.descripcion
+                        }
+
+                        return Object.entries(descripcion).map(([key, value]) => (
+                          <p key={key}>
+                            <strong>{key}:</strong> {value}
+                          </p>
+                        ))
+                      })
+                    }
+                  </div>
                   <div className='mt-3'>
                     <span className={`px-3 py-1 text-sm rounded-xl font-medium 
                       ${t.estado === 'activo' ? 'bg-green-100 text-green-700' : t.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-500' : 'bg-green-100 text-green-700'}`}

@@ -43,7 +43,7 @@ export default function Login () {
     }
   }
   return (
-    <div className='flex flex-col justify-center items-center min-h-screen'>
+    <div className='flex flex-col justify-center items-center min-h-screen animate-fade-in-down'>
       <div className='flex flex-col items-center gap-2'>
         <h1 className='text-3xl md:text-4xl font-bold'>Welcome Back</h1>
         <span className='text-lg md:text-xl text-gray-500'>Manage your infrastructure with ease.</span>

@@ -7,7 +7,7 @@ export default function Invetario () {
 
   const invetario = async () => {
     try {
-      const res = await fetch('http://localhost:3000/inventario')
+      const res = await fetch('https://api-equipo-yh4r.onrender.com/inventario')
       const data = await res.json()
       setInventario(data)
     } catch (error) {
