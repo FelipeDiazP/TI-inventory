@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { Link } from 'react-router-dom'
 
-export default function Login () {
+export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [form, setForm] = useState({
     email: '',
@@ -81,6 +82,10 @@ export default function Login () {
             Sign in
           </button>
         </form>
+
+        <Link to="/Register">
+          Ir a Register
+        </Link>
       </div>
     </div>
   )
