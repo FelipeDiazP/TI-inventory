@@ -1,42 +1,91 @@
 import { useEffect, useState } from 'react'
 import HeaderComponent from '../components/Header.jsx'
-import DashboardLayout from '../layouts/DashboardLayout'
-import { db } from '../config/database'
-import { collection, getDocs } from 'firebase/firestore'
+import DashboardLayout from '../layouts/DashboardLayout.jsx'
+import { createClient } from '@supabase/supabase-js'
 
-export default function Personal () {
-  const [soportes, setSoportes] = useState([])
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
 
-  const obtenerPersonal = async () => {
-    const querySnapshot = await getDocs(collection(db, 'Soportes'))
+export default function Personal() {
+  const [tecnicos, setTecnicos] = useState([])
 
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data()
-    }))
+  const obtenerTecnicos = async () => {
+  const { data, error } = await supabase
+    .from('tecnicos')
+    .select('*')
 
-    setSoportes(data)
-  }
+  console.log("📦 TECNICOS:", data)
+  console.log("❌ ERROR:", error)
+
+  if (error) return
+
+  setTecnicos(data)
+}
 
   useEffect(() => {
-    obtenerPersonal()
+    obtenerTecnicos()
   }, [])
+
   return (
     <DashboardLayout>
-      <div className='animate-fade-in-down'>
+      <div className="animate-fade-in-down">
+
         <HeaderComponent />
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'>
-          {soportes.map((s) => (
-            <div
-              key={s.id}
-              className='border-2 border-blue-600 p-4 rounded-xl shadow bg-white'
-            >
-              <h2 className='text-lg font-bold'>{s.name}</h2>
-              <p className='text-gray-600'>{s.email}</p>
-              <p className='text-sm text-gray-500'>{s.company}</p>
-            </div>
-          ))}
-        </div>
+
+        <main className="p-4">
+
+          <h1 className="text-2xl font-bold mb-4">
+            👨‍🔧 Personal técnico
+          </h1>
+
+          {/* LISTA */}
+          <div className="space-y-3">
+
+            {tecnicos.length === 0 ? (
+              <p className="text-gray-500">
+                No hay técnicos registrados
+              </p>
+            ) : (
+              tecnicos.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex items-center justify-between p-4 bg-white border rounded-xl shadow-sm hover:shadow-md transition"
+                >
+
+                  {/* INFO IZQUIERDA */}
+                  <div className="flex items-center gap-3">
+
+                    {/* AVATAR */}
+                    <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                      {t.name?.charAt(0)}
+                    </div>
+
+                    {/* DATOS */}
+                    <div>
+                      <h2 className="font-semibold">
+                        {t.nombre}
+                      </h2>
+
+                      <p className="text-sm text-gray-500">
+                        {t.correo}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* EMPRESA / TAG */}
+                  <span className="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                    {t.empresa || 'Técnico'}
+                  </span>
+
+                </div>
+              ))
+            )}
+
+          </div>
+        </main>
+
       </div>
     </DashboardLayout>
   )

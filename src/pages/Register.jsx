@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { doc, setDoc } from 'firebase/firestore'
-import { auth, db } from '../config/database'
-import { Building, LockKeyhole, Mail, User } from 'lucide-react'
 import Notification from '../components/Notification.jsx'
+import { Building, LockKeyhole, Mail, User } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
-export default function Register () {
+export default function Register() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [notification, setNotification] = useState({
@@ -29,6 +27,7 @@ export default function Register () {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!form.name || !form.email || !form.company || !form.password) {
       setNotification({
         message: 'Todos los campos son obligatorios',
@@ -36,33 +35,36 @@ export default function Register () {
       })
       return
     }
-    if (form.password.length < 0) {
+
+    if (form.password.length < 8) {
       setNotification({
         message: 'La contraseña debe tener minimo 8 caracteres',
         type: 'error'
       })
       return
     }
+
     try {
       setLoading(true)
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        form.email,
-        form.password
-      )
 
-      const user = userCredential.user
+      const { data, error } = await supabase
+        .from('tecnicos')
+        .insert([
+          {
+            nombre: form.name,
+            correo: form.email,
+            empresa: form.company,
+            password: form.password
+          }
+        ])
+        .select()
 
-      await setDoc(doc(db, 'Soportes', user.uid), {
-        name: form.name,
-        email: form.email,
-        company: form.company,
-        password: form.password,
-        createdAt: new Date()
-      })
-      console.log('Usuario agregado en Firestore')
+      if (error) throw error
+
+      console.log('Tecnico creado:', data)
+
       setNotification({
-        message: 'Se registro con exito',
+        message: 'Se registro con éxito',
         type: 'success'
       })
 
@@ -70,11 +72,12 @@ export default function Register () {
         navigate('/')
       }, 1500)
     } catch (error) {
+      console.log(error)
+
       setNotification({
-        message: 'Este correo ya esta registrado',
+        message: error.message || 'Error en el registro',
         type: 'error'
       })
-      console.log('Error:', error.message)
     } finally {
       setLoading(false)
     }

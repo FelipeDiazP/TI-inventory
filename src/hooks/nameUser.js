@@ -1,34 +1,27 @@
 import { useEffect, useState } from 'react'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../config/database'
 
-export function nameUser () {
+export function useNameUser (email) {
   const [nombre, setNombre] = useState('')
-  const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const auth = getAuth()
+    const getUser = async () => {
+      try {
+        const res = await fetch(`http://localhost:3000/api/v1/tecnicos/email/${email}`)
+        const data = await res.json()
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const uid = user.uid
-        setEmail(user.email)
-
-        const docRef = doc(db, 'Soportes', uid)
-        const docSnap = await getDoc(docRef)
-
-        if (docSnap.exists()) {
-          setNombre(docSnap.data().name)
+        if (res.ok) {
+          setNombre(data.name)
         }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setLoading(false)
       }
+    }
 
-      setLoading(false)
-    })
+    if (email) getUser()
+  }, [email])
 
-    return () => unsubscribe()
-  }, [])
-
-  return { nombre, email, loading }
+  return { nombre, loading }
 }

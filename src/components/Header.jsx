@@ -1,8 +1,8 @@
-import { nameUser } from '../hooks/nameUser.js'
+import { useNameUser } from '../hooks/nameUser.js'
 import { User } from 'lucide-react'
 
 export default function HeaderComponent () {
-  const { nombre } = nameUser()
+  const { nombre } = useNameUser()
   const fecha = new Date().toLocaleDateString('es-Co', {
     weekday: 'long',
     year: 'numeric',

@@ -1,130 +1,176 @@
 import DashboardLayout from '../layouts/DashboardLayout.jsx'
 import { useEffect, useState } from 'react'
-import { collection, getDocs } from 'firebase/firestore'
-import { db } from '../config/database'
 import HeaderComponent from '../components/Header.jsx'
+import { createClient } from '@supabase/supabase-js'
 
-export default function Dashboard () {
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
+
+export default function Dashboard() {
   const [tickets, setTickets] = useState([])
-  const [soportes, setSoportes] = useState([])
+  const [tecnicos, setTecnicos] = useState([])
 
+  // =====================
+  // TICKETS
+  // =====================
   const obtenerTickets = async () => {
-    const rest = await fetch('https://api-equipo-yh4r.onrender.com/tickets')
-    const data = await rest.json()
+    const { data, error } = await supabase
+      .from('tickets')
+      .select('*')
+      .order('id', { ascending: false })
+
+    if (error) {
+      console.log('tickets error:', error.message)
+      return
+    }
+
     setTickets(data)
   }
 
-  const obtenerSoportes = async () => {
-    const querySnapshot = await getDocs(collection(db, 'Soportes'))
+  // =====================
+  // TECNICOS
+  // =====================
+  const obtenerTecnicos = async () => {
+    const { data, error } = await supabase
+      .from('tecnicos') // 👈 ASEGÚRATE QUE EXISTE
+      .select('*')
 
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data()
-    }))
+    if (error) {
+      console.log('tecnicos error:', error.message)
+      return
+    }
 
-    setSoportes(data)
+    setTecnicos(data)
   }
 
+  // =====================
+  // ASIGNAR TECNICO
+  // =====================
+  const asignarTecnico = async (ticketId, tecnicoId) => {
+    const { error } = await supabase
+      .from('tickets')
+      .update({ tecnico_id: Number(tecnicoId) })
+      .eq('id', ticketId)
+
+    if (error) {
+      console.log('assign error:', error.message)
+      return
+    }
+
+    obtenerTickets()
+  }
+
+  // =====================
+  // CAMBIAR ESTADO (CORRECTO)
+  // =====================
+  const cambiarEstado = async (ticket) => {
+    let nuevoEstado = 'Pendiente'
+
+    if (ticket.estado_ticket === 'Pendiente') {
+      nuevoEstado = 'En proceso'
+    } else if (ticket.estado_ticket === 'En proceso') {
+      nuevoEstado = 'Resuelto'
+    }
+
+    const { error } = await supabase
+      .from('tickets')
+      .update({ estado_ticket: nuevoEstado })
+      .eq('id', ticket.id)
+
+    if (error) {
+      console.log('estado error:', error.message)
+      return
+    }
+
+    obtenerTickets()
+  }
+
+  // =====================
+  // INIT
+  // =====================
   useEffect(() => {
     obtenerTickets()
-    obtenerSoportes()
+    obtenerTecnicos()
   }, [])
 
-  const asignarSoporte = async (ticketId, soporteId) => {
-    await fetch(`https://api-equipo-yh4r.onrender.com/${ticketId}/asignar`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ soporteId })
-    })
-    obtenerTickets()
-  }
-
-  const getNombre = (id) => {
-    const soporteEncontrado = soportes.find((s) => s.id === id)
-    return soporteEncontrado ? soporteEncontrado.name : 'Sin asignar'
-  }
-
-  const cambiarEstado = async (id, estadoActual) => {
-    const nuevoEstado = estadoActual === 'Pendiente' ? 'Resuelto' : 'Pendiente'
-
-    await fetch(`https://api-equipo-yh4r.onrender.com/tickets/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        estado: nuevoEstado
-      })
-    })
-    obtenerTickets()
+  // =====================
+  // GET TECNICO NAME
+  // =====================
+  const getTecnico = (id) => {
+    const t = tecnicos.find(x => x.id === id)
+    return t ? (t.nombre || t.name) : 'Sin asignar'
   }
 
   return (
     <DashboardLayout>
-      <div className='text-black animate-fade-in-down'>
+      <div className="p-5">
+
         <HeaderComponent />
-        <main className='p-5'>
-          <h2 className='text-2xl font-bold'>Tickets</h2>
-          <div className='mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {
-              tickets.map((t) => (
-                <div key={t.id} className='bg-white rounded-2xl shadow-md p-4 border hover:shadow-lg transition'>
-                  <h3 className='text-lg font-semibold'>{t.titulo}</h3>
-                  <div className='text-gray-700 text-sm mt-1'>
-                    {
-                      (() => {
-                        let descripcion
 
-                        if (typeof t.descripcion === 'string') {
-                          try {
-                            descripcion = JSON.parse(t.descripcion)
-                          } catch {
-                            descripcion = { mensaje: t.descripcion }
-                          }
-                        } else {
-                          descripcion = t.descripcion
-                        }
+        <h1 className="text-2xl font-bold mt-4">
+          Tickets
+        </h1>
 
-                        return Object.entries(descripcion).map(([key, value]) => (
-                          <p key={key}>
-                            <strong>{key}:</strong> {value}
-                          </p>
-                        ))
-                      })
-                    }
-                  </div>
-                  <div className='mt-3'>
-                    <span className={`px-3 py-1 text-sm rounded-xl font-medium 
-                      ${t.estado === 'activo' ? 'bg-green-100 text-green-700' : t.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-500' : 'bg-green-100 text-green-700'}`}
-                    >
-                      {t.estado}
-                    </span>
-                  </div>
-                  <p className='text-sm mt-2'>
-                    👤 {getNombre(t.soporteId)}
-                  </p>
-                  <div className='mt-4 flex flex-col gap-2'>
-                    <button onClick={() => cambiarEstado(t.id, t.estado)} className='w-fit p-2 rounded-xl bg-blue-600 text-white transition hover:bg-blue-700 cursor-pointer'>
-                      Cambiar estado
-                    </button>
-                    <select onChange={(e) => asignarSoporte(t.id, e.target.value)} className='border rounded-lg p-1 text-sm' defaultValue=''>
-                      <option value='' disabled>
-                        Asingnar Soporte
-                      </option>
-                      {
-                        soportes.map((s) => (
-                          <option key={s.id} value={s.id}>{s.name}</option>
-                        ))
-                      }
-                    </select>
-                  </div>
-                </div>
-              ))
-            }
-          </div>
-        </main>
+        <div className="grid md:grid-cols-3 gap-4 mt-5">
+
+          {tickets.map(ticket => (
+            <div key={ticket.id} className="border p-4 rounded-xl shadow">
+
+              <h2 className="font-bold">
+                {ticket.titulo}
+              </h2>
+
+              <p className="text-sm text-gray-600">
+                {ticket.descripcion}
+              </p>
+
+              {/* ESTADO */}
+              <div className="mt-2">
+                <span className="px-2 py-1 text-xs rounded bg-gray-200">
+                  {ticket.estado_ticket}
+                </span>
+              </div>
+
+              {/* TECNICO */}
+              <p className="text-sm mt-2">
+                👨‍🔧 {getTecnico(ticket.tecnico_id)}
+              </p>
+
+              {/* BOTONES */}
+              <div className="mt-3 flex flex-col gap-2">
+
+                <button
+                  onClick={() => cambiarEstado(ticket)}
+                  className="bg-blue-600 text-white p-2 rounded"
+                >
+                  Cambiar estado
+                </button>
+
+                <select
+                  className="border p-1 rounded"
+                  onChange={(e) =>
+                    asignarTecnico(ticket.id, e.target.value)
+                  }
+                >
+                  <option value="">
+                    Asignar técnico
+                  </option>
+
+                  {tecnicos.map(t => (
+                    <option key={t.id} value={t.id}>
+                      {t.nombre || t.name}
+                    </option>
+                  ))}
+                </select>
+
+              </div>
+
+            </div>
+          ))}
+
+        </div>
       </div>
     </DashboardLayout>
   )
