@@ -90,26 +90,20 @@ export default function Register() {
         type={notification.type}
         onClose={() => setNotification({ message: '', type: '' })}
       />
-      <div className='flex items-center gap-2 mb-6'>
-        <img src='./Icon.png' alt='Icon register' className='w-6 h-6' />
-        <h1 className='text-lg font-semibold text-gray-800'>
-          IT Inventory
-        </h1>
-      </div>
 
       <div className='bg-white w-full max-w-md p-8 rounded-xl shadow-sm border border-gray-200'>
         <h2 className='text-lg md:text-xl font-semibold text-gray-900'>
-          Create Your Account
+          Crea tu cuenta
         </h2>
 
         <p className='text-sm text-gray-500 mt-1'>
-          Start managing your IT infrastructure today.
+          Centraliza y administra tus tickets de forma eficiente.
         </p>
 
         <form className='mt-6 flex flex-col gap-5' onSubmit={handleSubmit}>
           <div>
             <label className='text-sm font-medium text-gray-700'>
-              Full Name
+              Nombre Completo
             </label>
             <div className='flex items-center gap-3 mt-1 border border-gray-300 rounded-lg px-3 py-2'>
               <User size={18} className='text-gray-400' />
@@ -118,14 +112,14 @@ export default function Register() {
                 name='name'
                 value={form.name}
                 onChange={handleChange}
-                placeholder='Enter your full name'
+                placeholder='Duvan Jose Mendez Flores'
                 className='flex-1 outline-none text-sm'
               />
             </div>
           </div>
           <div>
             <label className='text-sm font-medium text-gray-700'>
-              Work Email
+              Correo empresarial
             </label>
             <div className='flex items-center gap-3 mt-1 border border-gray-300 rounded-lg px-3 py-2'>
               <Mail size={18} className='text-gray-400' />
@@ -141,7 +135,7 @@ export default function Register() {
           </div>
           <div>
             <label className='text-sm font-medium text-gray-700'>
-              Company Name
+              Nombre Empresa
             </label>
             <div className='flex items-center gap-3 mt-1 border border-gray-300 rounded-lg px-3 py-2'>
               <Building size={18} className='text-gray-400' />
@@ -157,7 +151,7 @@ export default function Register() {
           </div>
           <div>
             <label className='text-sm font-medium text-gray-700'>
-              Password
+              Contraseña
             </label>
             <div className='flex items-center gap-3 mt-1 border border-gray-300 rounded-lg px-3 py-2'>
               <LockKeyhole size={18} className='text-gray-400' />
@@ -171,7 +165,7 @@ export default function Register() {
               />
             </div>
             <p className='text-xs text-gray-400 mt-1'>
-              Minimum 8 characters with numbers and symbols
+              Minimo 8 caracteres entre letras y simbolos
             </p>
           </div>
           <button
@@ -184,9 +178,9 @@ export default function Register() {
 
         </form>
         <p className='text-gray-500 text-center mt-6'>
-          Already have an account?{' '}
+          Ya tienes cuenta?{' '}
           <a className='ml-2 text-blue-600 font-bold cursor-pointer' onClick={() => navigate('/')}>
-            Sign in
+            Inicia Sesion
           </a>
         </p>
 

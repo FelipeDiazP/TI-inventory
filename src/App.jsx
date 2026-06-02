@@ -6,6 +6,7 @@ import Invetario from './pages/Inventario'
 import Personal from './pages/Personal'
 import Configuracion from './pages/Configuracion'
 import './App.css'
+import PresentationPage from './pages/PresentationPage'
 
 function App () {
   return (
@@ -16,6 +17,7 @@ function App () {
       <Route path='/Inventario' element={<Invetario />} />
       <Route path='/Personal' element={<Personal />} />
       <Route path='/Configuracion' element={<Configuracion />} />
+      <Route path='/PresentationPage' element={<PresentationPage />} />
     </Routes>
   )
 }

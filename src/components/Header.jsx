@@ -18,7 +18,7 @@ export default function HeaderComponent () {
           <span>{fecha}</span>
           <div className='flex gap-2 border-2 border-blue-500 rounded-2xl p-2 '>
             <User size={20} className='text-blue-600' />
-            <h1 className='font-bold text-blue-600'>Supporter {nombre}</h1>
+            <h1 className='font-bold text-blue-600'>Tecnico {nombre}</h1>
           </div>
         </section>
       </div>

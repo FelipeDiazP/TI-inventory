@@ -3,7 +3,6 @@ import HeaderComponent from '../components/Header.jsx'
 import DashboardLayout from '../layouts/DashboardLayout.jsx'
 import { createClient } from '@supabase/supabase-js'
 
-// 🔥 CONEXIÓN SUPABASE
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -12,9 +11,6 @@ const supabase = createClient(
 export default function Inventario() {
   const [inventario, setInventario] = useState([])
 
-  // =========================
-  // OBTENER INVENTARIO
-  // =========================
   const obtenerInventario = async () => {
     const { data, error } = await supabase
       .from('inventario')
@@ -43,7 +39,7 @@ export default function Inventario() {
             Inventario
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in-down">
 
             {inventario.length === 0 ? (
               <p className="text-gray-500">

@@ -41,7 +41,7 @@ export default function Personal() {
           </h1>
 
           {/* LISTA */}
-          <div className="space-y-3">
+          <div className="space-y-3 animate-fade-in">
 
             {tecnicos.length === 0 ? (
               <p className="text-gray-500">

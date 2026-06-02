@@ -49,17 +49,23 @@ export default function Dashboard() {
   // ASIGNAR TECNICO
   // =====================
   const asignarTecnico = async (ticketId, tecnicoId) => {
-    const { error } = await supabase
+    console.log('Ticket:', ticketId)
+    console.log('Tecnico:', tecnicoId)
+
+    const { data, error } = await supabase
       .from('tickets')
-      .update({ tecnico_id: Number(tecnicoId) })
+      .update({
+        tecnico_id: Number(tecnicoId)
+      })
       .eq('id', ticketId)
+      .select()
 
-    if (error) {
-      console.log('assign error:', error.message)
-      return
+    console.log('DATA:', data)
+    console.log('ERROR:', error)
+
+    if (!error) {
+      obtenerTickets()
     }
-
-    obtenerTickets()
   }
 
   // =====================
@@ -99,13 +105,13 @@ export default function Dashboard() {
   // GET TECNICO NAME
   // =====================
   const getTecnico = (id) => {
-    const t = tecnicos.find(x => x.id === id)
-    return t ? (t.nombre || t.name) : 'Sin asignar'
+    const tecnico = tecnicos.find(t => t.id === id)
+    return tecnico?.nombre || 'Sin asignar'
   }
 
   return (
     <DashboardLayout>
-      <div className="p-5">
+      <div className="p-5 animate-fade-in">
 
         <HeaderComponent />
 
@@ -133,9 +139,8 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              {/* TECNICO */}
-              <p className="text-sm mt-2">
-                👨‍🔧 {getTecnico(ticket.tecnico_id)}
+              <p className='text-sm mt-2'>
+                👨‍🔧 Técnico: {getTecnico(ticket.tecnico_id)}
               </p>
 
               {/* BOTONES */}
